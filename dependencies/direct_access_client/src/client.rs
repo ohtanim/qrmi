@@ -1,5 +1,5 @@
 //
-// (C) Copyright IBM 2024, 2025
+// (C) Copyright IBM 2024-2026
 //
 // This code is licensed under the Apache License, Version 2.0. You may
 // obtain a copy of this license in the LICENSE.txt file in the root directory
@@ -398,7 +398,8 @@ impl ClientBuilder {
     ///         "my_aws_secret_access_key",
     ///         "http://localhost:9000",
     ///         "my_bucket",
-    ///         "us-east-1");
+    ///         "us-east-1",
+    ///         None::<String>);
     /// ```
     ///
     pub fn with_s3bucket(
@@ -550,8 +551,8 @@ impl ClientBuilder {
                 middleware_client_builder =
                     middleware_client_builder.with(RetryTransientMiddleware::new_with_policy(v));
             }
-            middleware_plain_client_builder = middleware_plain_client_builder
-                .with(RetryTransientMiddleware::new_with_policy(v));
+            middleware_plain_client_builder =
+                middleware_plain_client_builder.with(RetryTransientMiddleware::new_with_policy(v));
         };
 
         #[cfg(feature = "ibmcloud_appid_auth")]
