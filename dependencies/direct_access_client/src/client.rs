@@ -551,8 +551,8 @@ impl ClientBuilder {
                 middleware_client_builder =
                     middleware_client_builder.with(RetryTransientMiddleware::new_with_policy(v));
             }
-            middleware_plain_client_builder = middleware_plain_client_builder
-                .with(RetryTransientMiddleware::new_with_policy(v));
+            middleware_plain_client_builder =
+                middleware_plain_client_builder.with(RetryTransientMiddleware::new_with_policy(v));
         };
 
         #[cfg(feature = "ibmcloud_appid_auth")]
