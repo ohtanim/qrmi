@@ -1,0 +1,23 @@
+[package]
+name = "oqtopus-cloud"
+keywords = ["rest-api", "http-client", "api-bindings"]
+version = "0.1.0"
+authors = ["oqtopus-team[at]googlegroups.com"]
+description = "OQTOPUS Cloud User API. This API is used to interact with the OQTOPUS Cloud service. The API provides endpoints to manage devices, jobs, and results."
+license.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde = { version = "^1.0", features = ["derive"] }
+serde_with = { version = "^3.8", default-features = false, features = ["base64", "std", "macros"] }
+serde_json = "^1.0"
+serde_repr = "^0.1"
+url = "^2.5"
+chrono = { version = "^0.4",  features = ["serde"] }
+reqwest = { version = "0.12.14", default-features = false, features = ["json", "multipart", "rustls-tls"] }
+
+[lints.clippy]
+needless_return = "allow"
+empty_docs = "allow"
+derivable_impls = "allow"

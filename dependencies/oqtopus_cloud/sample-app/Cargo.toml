@@ -1,0 +1,13 @@
+[package]
+name = "oqtopus-cloud-app"
+version = "0.1.0"
+edition = "2021"
+ 
+[dependencies]
+oqtopus-cloud = { path = ".." }
+ 
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12.14", default-features = false, features = ["json", "rustls-tls"] }
+anyhow = "1"
+
+[workspace]
