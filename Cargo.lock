@@ -2605,6 +2605,7 @@ dependencies = [
  "pyo3-stub-gen",
  "quantum-system-api",
  "quantum_compute_client",
+ "reqwest",
  "reqwest-retry",
  "serde",
  "serde_json",

@@ -42,6 +42,8 @@ pub enum ResourceType {
     AliceBobFelis,
     // IQM Server
     IQMServer,
+    // OQTOPUS Cloud
+    OqtopusCloud,
 }
 impl<'de> serde::Deserialize<'de> for ResourceType {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -60,6 +62,7 @@ impl<'de> serde::Deserialize<'de> for ResourceType {
                     "pasqal-local",
                     "alice-bob-felis",
                     "iqm-server",
+                    "oqtopus-cloud",
                 ],
             )
         })
@@ -75,6 +78,7 @@ impl ResourceType {
             ResourceType::PasqalLocal => "pasqal-local",
             ResourceType::AliceBobFelis => "alice-bob-felis",
             ResourceType::IQMServer => "iqm-server",
+            ResourceType::OqtopusCloud => "oqtopus-cloud",
         }
     }
 
@@ -94,6 +98,7 @@ impl ResourceType {
             "pasqal-local" => Some(ResourceType::PasqalLocal),
             "alice-bob-felis" => Some(ResourceType::AliceBobFelis),
             "iqm-server" => Some(ResourceType::IQMServer),
+            "oqtopus-cloud" => Some(ResourceType::OqtopusCloud),
             _ => None,
         }
     }
