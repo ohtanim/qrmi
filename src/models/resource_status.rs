@@ -51,6 +51,7 @@ pub enum ResourceStatusCode {
     Busy,
 }
 
+/// cbindgen:ignore
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(C)]
 #[cfg_attr(
