@@ -831,6 +831,10 @@ pub unsafe extern "C" fn qrmi_resource_free(ptr: *mut QuantumResource) -> Return
 /// @ingroup QrmiQuantumResource
 /// Returns true if device is accessible, otherwise false.
 ///
+/// @deprecated Use qrmi_resource_status() and
+/// qrmi_resource_status_is_accessible() instead. This function will be
+/// removed in a future release.
+///
 /// # Safety
 ///
 /// * `qrmi` must have been returned by a previous call to qrmi_resource_new().
