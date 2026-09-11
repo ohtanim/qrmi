@@ -174,6 +174,7 @@ pub trait QuantumResource: Send + Sync {
     /// #[tokio::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///     use qrmi::{ibm::IBMQuantumComputeService, QuantumResource};
+    ///     use qrmi::ResourceStatusCode;
     ///
     ///     let mut qrmi = IBMQuantumComputeService::new("ibm_torino")?;
     ///     let status = qrmi.status().await?;
