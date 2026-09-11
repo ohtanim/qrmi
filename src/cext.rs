@@ -1126,7 +1126,15 @@ pub unsafe extern "C" fn qrmi_resource_status_healthy(
 ///   QrmiResourceStatus *status = NULL;
 ///   QrmiReturnCode rc = qrmi_resource_status(qrmi, &status);
 ///   if (rc == QRMI_RETURN_CODE_SUCCESS) {
-///     printf("pending_job_count=%u\n", status->pending_job_count);
+///     uint64_t pending_job_count = 0;
+///     rc = qrmi_resource_status_pending_job_count(status, &pending_job_count);
+///     if (rc == QRMI_RETURN_CODE_SUCCESS) {
+///       printf("pending_job_count=%llu\n", (unsigned long long)pending_job_count);
+///     } else if (rc == QRMI_RETURN_CODE_UNSUPPORTED_FUNCTION_ERROR) {
+///       printf("this resource has no queue / does not report pending job count\n");
+///     } else {
+///       printf("qrmi_resource_status_pending_job_count() failed: %s\n", qrmi_get_last_error());
+///     }
 ///     qrmi_resource_status_free(status);
 ///   }
 /// @endcode
@@ -1137,6 +1145,7 @@ pub unsafe extern "C" fn qrmi_resource_status_healthy(
 ///         @ref QrmiReturnCode::QRMI_RETURN_CODE_UNSUPPORTED_FUNCTION_ERROR
 ///         if the resource has no queue / the vendor does not report this.
 /// @version 0.25.0
+#[no_mangle]
 pub unsafe extern "C" fn qrmi_resource_status_pending_job_count(
     status: *mut ResourceStatus,
     outp: *mut u64,
