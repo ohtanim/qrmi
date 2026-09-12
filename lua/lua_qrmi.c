@@ -214,6 +214,9 @@ static lua_qrmi_resource_t *check_resource(lua_State *L, int idx) {
  *
  * Wraps qrmi_resource_is_accessible().
  *
+ * @deprecated Use resource:status() and resource:status.is_accessible instead.
+ * This function will be removed in a future release.
+ *
  * Lua usage:
  * @code
  *   local accessible, err = resource:is_accessible()
@@ -227,6 +230,10 @@ static lua_qrmi_resource_t *check_resource(lua_State *L, int idx) {
 static int l_is_accessible(lua_State *L) {
     lua_qrmi_resource_t *ud = check_resource(L, 1);
     bool accessible = false;
+
+    fprintf(stderr,
+        "warning: resource:is_accessible() is deprecated, use resource:status() instead\n");
+
     QrmiReturnCode rc = qrmi_resource_is_accessible(ud->handle, &accessible);
     if (rc != QRMI_RETURN_CODE_SUCCESS) return push_qrmi_error(L, rc);
     lua_pushboolean(L, accessible);
