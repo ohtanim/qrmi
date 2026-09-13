@@ -52,6 +52,19 @@ pub enum ResourceStatusCode {
     Busy,
 }
 
+impl ResourceStatusCode {
+    /// Returns a lowercase, human-readable representation
+    /// ("online", "offline", "paused", "busy").
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Online => "online",
+            Self::Offline => "offline",
+            Self::Paused => "paused",
+            Self::Busy => "busy",
+        }
+    }
+}
+
 /// cbindgen:ignore
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
 #[repr(C)]

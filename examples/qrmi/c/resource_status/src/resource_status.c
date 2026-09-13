@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
         break;
       }
     }
+    fprintf(stdout, "%s\n", qrmi_resource_status_code_to_string(code));
 
     char *reason = qrmi_resource_status_reason(status);
     if (reason != NULL) {

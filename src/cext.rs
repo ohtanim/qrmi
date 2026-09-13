@@ -1019,6 +1019,37 @@ pub unsafe extern "C" fn qrmi_resource_status_code(
 }
 
 /// @ingroup QrmiResourceStatus
+/// Converts a QrmiResourceStatusCode value to a human-readable, lowercase
+/// string ("online", "offline", "paused", "busy"). Intended for logging
+/// and diagnostic output.
+///
+/// # Example
+///
+/// @code
+///   QrmiResourceStatusCode code;
+///   QrmiReturnCode rc = qrmi_resource_status_code(status, &code);
+///   if (rc == QRMI_RETURN_CODE_SUCCESS) {
+///     printf("status=%s\n", qrmi_resource_status_code_to_string(code));
+///   }
+/// @endcode
+///
+/// @param (code) [in] A QrmiResourceStatusCode value
+/// @return A statically-allocated, human-readable string. Must NOT be
+///         freed and remains valid for the lifetime of the program.
+/// @version 0.25.0
+#[no_mangle]
+pub extern "C" fn qrmi_resource_status_code_to_string(
+    code: crate::models::ResourceStatusCode,
+) -> *const c_char {
+    match code {
+        crate::models::ResourceStatusCode::Online => c"online".as_ptr(),
+        crate::models::ResourceStatusCode::Offline => c"offline".as_ptr(),
+        crate::models::ResourceStatusCode::Paused => c"paused".as_ptr(),
+        crate::models::ResourceStatusCode::Busy => c"busy".as_ptr(),
+    }
+}
+
+/// @ingroup QrmiResourceStatus
 /// Returns the vendor-specific status reason (e.g. "maintenance",
 /// "calibration"), if reported.
 ///

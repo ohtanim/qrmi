@@ -134,13 +134,7 @@ static const char *task_status_to_string(QrmiTaskStatus s) {
  *         @p s does not match any known variant.
  */
 static const char *status_code_to_string(QrmiResourceStatusCode s) {
-    switch (s) {
-        case QRMI_RESOURCE_STATUS_CODE_ONLINE:  return "online";
-        case QRMI_RESOURCE_STATUS_CODE_OFFLINE: return "offline";
-        case QRMI_RESOURCE_STATUS_CODE_PAUSED:  return "paused";
-        case QRMI_RESOURCE_STATUS_CODE_BUSY:    return "busy";
-        default: return "unknown";
-    }
+    return qrmi_resource_status_code_to_string(s);
 }
 
 /**
