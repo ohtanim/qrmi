@@ -17,7 +17,7 @@ use {
 
 /// Resource capacity.
 #[repr(C)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
 #[cfg_attr(
     feature = "pyo3",
     pyclass(eq, get_all, skip_from_py_object),
@@ -37,7 +37,8 @@ pub struct ResourceCapacity {
     pyclass(eq, eq_int, hash, frozen, skip_from_py_object),
     gen_stub_pyclass_enum
 )]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum ResourceStatusCode {
     /// Online and available.
     Online,
@@ -52,7 +53,7 @@ pub enum ResourceStatusCode {
 }
 
 /// cbindgen:ignore
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize)]
 #[repr(C)]
 #[cfg_attr(
     feature = "pyo3",
@@ -88,6 +89,8 @@ impl ResourceStatus {
     }
 }
 
+// Python-facing methods. Thin wrappers around the plain inherent impl
+// above, plus Python-convenience helpers (e.g. to_dict()).
 #[cfg(feature = "pyo3")]
 #[gen_stub_pymethods]
 #[pymethods]
@@ -97,6 +100,19 @@ impl ResourceStatus {
     #[pyo3(name = "is_accessible")]
     fn py_is_accessible(&self) -> bool {
         self.is_accessible()
+    }
+
+    /// Returns this status as a plain, JSON-serializable dict.
+    /// Equivalent to calling ``json.dumps(status.to_dict())``.
+    ///
+    /// Field values mirror this struct's ``serde::Serialize``
+    /// implementation: ``status`` is a lowercase string (e.g.
+    /// ``"online"``), and fields the vendor does not report
+    /// (``status_reason``, ``healthy``, ``capacity``,
+    /// ``pending_job_count``) are ``None``.
+    fn to_dict<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        use pyo3::exceptions::PyValueError;
+        pythonize::pythonize(py, self).map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }
 

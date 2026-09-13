@@ -11,6 +11,7 @@
 
 """An example of QRMI status()"""
 
+import json
 import argparse
 from logging import getLogger, basicConfig, DEBUG
 from dotenv import load_dotenv
@@ -82,3 +83,5 @@ if status.capacity:
     logger.info("max slots: %d", status.capacity.max_slots)
 else:
     logger.warning("this resource not report capacity")
+
+print(json.dumps(status.to_dict(), indent=2))
