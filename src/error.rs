@@ -69,15 +69,22 @@ pub enum QrmiError {
     #[error("payload type is not supported: {0}")]
     UnsupportedPayload(String),
 
+    /// The requested operation is not supported by this backend's
+    /// implementation of `QuantumResource`.
+    #[error("unsupported function: {0}")]
+    UnsupportedFunction(String),
+
     /// The task is not in a state that allows the requested operation
     /// (e.g. asking for the result of a task that is still running).
     #[error("unable to retrieve result for task {task_id}: {reason}")]
     TaskNotReady { task_id: String, reason: String },
 
-    /// A required key was missing from a provider's environment variable map
-    /// (as opposed to [`QrmiError::EnvVarNotSet`], which is for real OS
-    /// environment variables).
-    #[error("missing '{0}' in environment map")]
+    /// A required key was missing from a config map. Either a provider's
+    /// environment-variable-style map (e.g. [`crate::resource_provider`]) or
+    /// a `from_config` constructor's generic config map (as opposed to
+    /// [`QrmiError::EnvVarNotSet`], which is for real OS environment
+    /// variables).
+    #[error("missing required config key: '{0}'")]
     MissingConfigKey(String),
 
     /// A configuration value (or combination of values) was invalid in a way
@@ -86,6 +93,7 @@ pub enum QrmiError {
     /// other. See [`QrmiError::ParseError`] for the single-value case.
     #[error("invalid configuration: {0}")]
     InvalidConfig(String),
+
     /// The named resource (e.g. a backend) does not exist.
     #[error("resource not found: {0}")]
     ResourceNotFound(String),
@@ -150,6 +158,7 @@ impl QrmiError {
             QrmiError::ParseError { .. } => QrmiErrorKind::ParseError,
             QrmiError::UnsupportedResourceType(_) => QrmiErrorKind::UnsupportedResourceType,
             QrmiError::UnsupportedPayload(_) => QrmiErrorKind::UnsupportedPayload,
+            QrmiError::UnsupportedFunction(_) => QrmiErrorKind::UnsupportedFunction,
             QrmiError::TaskNotReady { .. } => QrmiErrorKind::TaskNotReady,
             QrmiError::MissingConfigKey(_) => QrmiErrorKind::MissingConfigKey,
             QrmiError::InvalidConfig(_) => QrmiErrorKind::InvalidConfig,
@@ -185,9 +194,11 @@ pub enum QrmiErrorKind {
     UnsupportedResourceType,
     /// The payload variant is not supported by this backend.
     UnsupportedPayload,
+    /// The requested operation is not supported by this resource.
+    UnsupportedFunction,
     /// The task is not in a state that allows the requested operation.
     TaskNotReady,
-    /// A required key was missing from a provider's environment variable map.
+    /// A required key was missing from a provider's config map.
     MissingConfigKey,
     /// A configuration value (or combination of values) was invalid.
     InvalidConfig,
@@ -204,13 +215,4 @@ pub enum QrmiErrorKind {
     InvalidInput,
     /// Everything else (vendor API failures, I/O, ...).
     Other,
-}
-
-/// Reads a required environment variable, returning a [`QrmiError::EnvVarNotSet`]
-/// with the variable's name if it isn't set. This replaces the repeated
-/// `env::var(name).map_err(|_| anyhow!("{name} environment variable is not set"))?`
-/// pattern that shows up throughout the vendor backends.
-pub(crate) fn required_env(name: impl Into<String>) -> Result<String, QrmiError> {
-    let name = name.into();
-    std::env::var(&name).map_err(|_| QrmiError::EnvVarNotSet(name))
 }

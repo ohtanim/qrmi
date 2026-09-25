@@ -11,21 +11,42 @@ Because QRMI is an environment variable driven software library, all configurati
 
 | Environment variables | Descriptions |
 | ---- | ---- |
-| {resource_name}_QRMI_IBM_QCS_ENDPOINT | Quantum Compute Service endpoint URL(e.g. `https://quantum.cloud.ibm.com/api`) |
-| {resource_name}_QRMI_IBM_QCS_IAM_ENDPOINT | IBM Cloud IAM endpoint URL(e.g. `https://iam.cloud.ibm.com`) |
+| {resource_name}_QRMI_IBM_QCS_ENDPOINT | IBM Quantum Compute Service endpoint URL (e.g. `https://quantum.cloud.ibm.com/api`) |
+| {resource_name}_QRMI_IBM_QCS_IAM_ENDPOINT | IBM Cloud IAM endpoint URL (e.g. `https://iam.cloud.ibm.com`) |
 | {resource_name}_QRMI_IBM_QCS_IAM_APIKEY | IBM Cloud IAM API Key |
-| {resource_name}_QRMI_IBM_QCS_SERVICE_CRN | Cloud Resource Name(CRN) of the provisioned Quantum Compute Service instance, starting with `crn:v1:`. |
+| {resource_name}_QRMI_IBM_QCS_SERVICE_CRN | Cloud Resource Name (CRN) of the provisioned Quantum Compute Service instance, starting with `crn:v1:`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_MODE | Execution mode to run the session in, `default='dedicated'`, `batch` or `dedicated`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_MAX_TTL | The maximum time (in seconds) for the session to run, subject to plan limits, default: `28800`. |
 | {resource_name}_QRMI_IBM_QCS_TIMEOUT_SECONDS | (Optional) Cost of the job as the estimated time it should take to complete (in seconds). Should not exceed the cost of the program, default: `None`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_ID | (Optional) Session ID, can be obtanied by acquire function. If exists, used in the target functions. |
+
+## Alternative: create the resource from a config map
+
+Since QRMI v0.25.0, a resource can also be built from an explicit config map
+instead of environment variables, via `IBMQuantumComputeService::from_config()`:
+
+```rust
+use qrmi::ibm::IBMQuantumComputeService;
+use std::collections::HashMap;
+
+let config = HashMap::from([
+    ("QRMI_IBM_QCS_ENDPOINT".to_string(), "https://quantum.cloud.ibm.com/api/v1".to_string()),
+    ("QRMI_IBM_QCS_IAM_ENDPOINT".to_string(), "https://iam.cloud.ibm.com".to_string()),
+    ("QRMI_IBM_QCS_IAM_APIKEY".to_string(), "your_apikey".to_string()),
+    ("QRMI_IBM_QCS_SERVICE_CRN".to_string(), "your_instance".to_string()),
+]);
+let qrmi = IBMQuantumComputeService::from_config("ibm_torino", config)?;
+```
+
+See the [0.25.0 migration guide](../../../../docs/migration/0.25.0.md) for
+the full set of required/optional keys per resource type.
 
 ## Create Qiskit Primitive input file as input
 
 Refer [this tool](../../../../examples/task_runner/qiskit) to generate. You can customize quantum circuits by editing the code.
 
 > [!NOTE]
-> Use the file with name ending with `_params_only.json`, e.g. `sampler_input_ibm_torino_params_only.json`.
+> Use the file with name ending `_params_only.json`, e.g. `sampler_input_ibm_torino_params_only.json`.
 
 ## How to build this example
 
