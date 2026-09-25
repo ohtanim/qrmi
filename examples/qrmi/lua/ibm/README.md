@@ -24,14 +24,31 @@ Because QRMI is an environment variable driven software library, all configurati
 
 | Environment variables | Descriptions |
 | ---- | ---- |
-| {resource_name}_QRMI_IBM_QCS_ENDPOINT | Quantum Compute Service endpoint URL(e.g. `https://quantum.cloud.ibm.com/api`) |
-| {resource_name}_QRMI_IBM_QCS_IAM_ENDPOINT | IBM Cloud IAM endpoint URL(e.g. `https://iam.cloud.ibm.com`) |
+| {resource_name}_QRMI_IBM_QCS_ENDPOINT | IBM Quantum Compute Service endpoint URL (e.g. `https://quantum.cloud.ibm.com/api`) |
+| {resource_name}_QRMI_IBM_QCS_IAM_ENDPOINT | IBM Cloud IAM endpoint URL (e.g. `https://iam.cloud.ibm.com`) |
 | {resource_name}_QRMI_IBM_QCS_IAM_APIKEY | IBM Cloud IAM API Key |
-| {resource_name}_QRMI_IBM_QCS_SERVICE_CRN | Cloud Resource Name(CRN) of the provisioned Quantum Compute Service instance, starting with `crn:v1:`. |
+| {resource_name}_QRMI_IBM_QCS_SERVICE_CRN | Cloud Resource Name (CRN) of the provisioned Quantum Compute Service instance, starting with `crn:v1:`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_MODE | Execution mode to run the session in, `default='dedicated'`, `batch` or `dedicated`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_MAX_TTL | The maximum time (in seconds) for the session to run, subject to plan limits, default: `28800`. |
 | {resource_name}_QRMI_IBM_QCS_TIMEOUT_SECONDS | (Optional) Cost of the job as the estimated time it should take to complete (in seconds). Should not exceed the cost of the program, default: `None`. |
 | {resource_name}_QRMI_IBM_QCS_SESSION_ID | (Optional) Session ID, can be obtanied by acquire function. If exists, used in the target functions. |
+
+## Alternative: create the resource from a config map
+
+Since QRMI v0.25.0, a resource can also be built from an explicit Lua table
+instead of environment variables, via `qrmi.new_from_config()`:
+
+```lua
+local resource, err = qrmi.new_from_config("ibm_torino", "ibm-quantum-compute-service", {
+    QRMI_IBM_QCS_ENDPOINT = "https://quantum.cloud.ibm.com/api/v1",
+    QRMI_IBM_QCS_IAM_ENDPOINT = "https://iam.cloud.ibm.com",
+    QRMI_IBM_QCS_IAM_APIKEY = "your_apikey",
+    QRMI_IBM_QCS_SERVICE_CRN = "your_instance",
+})
+```
+
+See the [0.25.0 migration guide](../../../../docs/migration/0.25.0.md) for
+the full set of required/optional keys per resource type.
 
 ## Create Qiskit Primitive input file as input
 

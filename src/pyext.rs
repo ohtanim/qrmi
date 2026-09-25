@@ -32,7 +32,7 @@ use common::to_py_err;
 pub use common::{
     AuthenticationFailedError, ConfigError, EnvVarNotSetError, InvalidInputError, QrmiError_,
     ResourceNotFoundError, ResourceType, TaskNotFoundError, TaskNotReadyError,
-    UnsupportedPayloadError, UnsupportedResourceTypeError,
+    UnsupportedFunctionError, UnsupportedPayloadError, UnsupportedResourceTypeError,
 };
 
 #[gen_stub_pyclass]
@@ -87,6 +87,26 @@ impl PyQuantumResource {
         crate::common::initialize();
         let qrmi = crate::common::create_resource(&resource_type.into(), resource_id)
             .map_err(to_py_err)?;
+
+        Ok(Self {
+            qrmi,
+            rt: std::mem::ManuallyDrop::new(
+                Runtime::new().expect("Failed to create a new tokio runtime."),
+            ),
+        })
+    }
+
+    /// Constructs a `QuantumResource` from a config of type `dict[str, str]`
+    #[staticmethod]
+    pub fn from_config(
+        resource_id: &str,
+        resource_type: ResourceType,
+        config: std::collections::HashMap<String, String>,
+    ) -> PyResult<Self> {
+        crate::common::initialize();
+        let qrmi =
+            crate::common::create_resource_from_config(&resource_type.into(), resource_id, config)
+                .map_err(to_py_err)?;
 
         Ok(Self {
             qrmi,
@@ -263,20 +283,21 @@ impl PyResourceDef {
 ///
 /// # Example (Python)
 ///
-/// ```python
-/// from qrmi import Config, ResourceProvider, ResourceType
+/// .. code-block:: python
 ///
-/// config = Config.load("/path/to/qrmi_config.json")
-/// resource_def = config.resource_map["ibm_inst1"]
+///     from qrmi import Config, ResourceProvider, ResourceType
 ///
-/// provider = ResourceProvider(ResourceType.IBMQuantumComputeService, resource_def.environment)
-/// resources = provider.resources()
-/// resources = provider.resources("num_qubits=127&name=ibm_*&status=online")
-/// resource  = provider.least_busy()
+///     config = Config.load("/path/to/qrmi_config.json")
+///     resource_def = config.resource_map["ibm_inst1"]
 ///
-/// for r in resources:
-///     print(r.resource_id())
-/// ```
+///     provider = ResourceProvider(ResourceType.IBMQuantumComputeService, resource_def.environment)
+///     resources = provider.resources()
+///     resources = provider.resources("num_qubits=127&name=ibm_*&status=online")
+///     resource  = provider.least_busy()
+///
+///     for r in resources:
+///         print(r.resource_id())
+///
 #[gen_stub_pyclass]
 #[pyclass]
 #[pyo3(name = "ResourceProvider")]
@@ -355,10 +376,11 @@ impl PyResourceProvider {
     ///
     /// # Example (Python)
     ///
-    /// ```python
-    /// resources = provider.resources()
-    /// resources = provider.resources("num_qubits=127&name=ibm_*")
-    /// ```
+    /// .. code-block:: python
+    ///
+    ///     resources = provider.resources()
+    ///     resources = provider.resources("num_qubits=127&name=ibm_*")
+    ///
     #[pyo3(signature = (filters=None))]
     pub fn resources(
         &self,
@@ -385,10 +407,11 @@ impl PyResourceProvider {
     ///
     /// # Example (Python)
     ///
-    /// ```python
-    /// resource = provider.least_busy()
-    /// resource = provider.least_busy("num_qubits=127&status=online")
-    /// ```
+    /// .. code-block:: python
+    ///
+    ///     resource = provider.least_busy()
+    ///     resource = provider.least_busy("num_qubits=127&status=online")
+    ///
     #[pyo3(signature = (filters=None))]
     pub fn least_busy(
         &self,
@@ -433,15 +456,16 @@ impl PyResourceProvider {
 ///
 /// # Example (Python)
 ///
-/// ```python
-/// from qrmi import QRMIService
+/// .. code-block:: python
 ///
-/// service = QRMIService()
-/// for resource in service.resources():
-///     print(resource.resource_id())
+///     from qrmi import QRMIService
 ///
-/// resource = service.resource("ibm_torino")
-/// ```
+///     service = QRMIService()
+///     for resource in service.resources():
+///         print(resource.resource_id())
+///
+///     resource = service.resource("ibm_torino")
+///
 #[gen_stub_pyclass]
 #[pyclass]
 #[pyo3(name = "QRMIService")]
@@ -515,18 +539,19 @@ impl PyQRMIService {
 ///
 /// # Example (Python)
 ///
-/// ```python
-/// from qrmi import Config, ResourceProvider
+/// .. code-block:: python
 ///
-/// config = Config.load("/path/to/qrmi_config.json")
+///     from qrmi import Config, ResourceProvider
 ///
-/// # Iterate over all resource definitions
-/// for name, resource_def in config.resource_map.items():
-///     print(f"{name}: is_dynamic={resource_def.is_dynamic}")
-///     if resource_def.is_dynamic:
-///         provider = ResourceProvider(resource_def.resource_type, resource_def.environment)
-///         resources = provider.resources()
-/// ```
+///     config = Config.load("/path/to/qrmi_config.json")
+///
+///     # Iterate over all resource definitions
+///     for name, resource_def in config.resource_map.items():
+///         print(f"{name}: is_dynamic={resource_def.is_dynamic}")
+///         if resource_def.is_dynamic:
+///             provider = ResourceProvider(resource_def.resource_type, resource_def.environment)
+///             resources = provider.resources()
+///
 #[gen_stub_pyclass]
 #[pyclass]
 #[pyo3(name = "Config")]
@@ -701,6 +726,10 @@ fn qrmi(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add(
         "UnsupportedPayloadError",
         m.py().get_type::<UnsupportedPayloadError>(),
+    )?;
+    m.add(
+        "UnsupportedFunctionError",
+        m.py().get_type::<UnsupportedFunctionError>(),
     )?;
     m.add("TaskNotReadyError", m.py().get_type::<TaskNotReadyError>())?;
     m.add("InvalidInputError", m.py().get_type::<InvalidInputError>())?;

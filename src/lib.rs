@@ -25,6 +25,8 @@ pub use resource_provider::ResourceProvider;
 pub mod service;
 pub use service::QRMIService;
 
+use uuid::Uuid;
+
 mod cext;
 pub mod models;
 #[cfg(feature = "pyo3")]
@@ -93,6 +95,7 @@ use async_trait::async_trait;
 pub type Result<T> = std::result::Result<T, QrmiError>;
 
 /// Defines interfaces to quantum resources.
+#[allow(unused_variables)]
 #[async_trait]
 pub trait QuantumResource: Send + Sync {
     /// Returns resource identifier of this quantum resource.
@@ -162,7 +165,15 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn acquire(&mut self) -> Result<String>;
+    async fn acquire(&mut self) -> Result<String> {
+        let resource_type = std::any::type_name::<Self>();
+        log::warn!(
+            "acquiring resource is not implemented by this resource({}); \
+             a dummy acquisition ID has been generated for backward compatibility.",
+            resource_type
+        );
+        Ok(Uuid::new_v4().to_string())
+    }
 
     /// Releases quantum resource
     ///
@@ -177,7 +188,15 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn release(&mut self, id: &str) -> Result<()>;
+    async fn release(&mut self, id: &str) -> Result<()> {
+        let resource_type = std::any::type_name::<Self>();
+        log::warn!(
+            "releasing resource is not implemented by this resource({}); \
+             this call is a no-op, so no resource was actually released.",
+            resource_type
+        );
+        Ok(())
+    }
 
     /// Start a task and returns an identifier of this task if succeeded.
     ///
@@ -211,7 +230,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn task_start(&mut self, payload: Payload) -> Result<String>;
+    async fn task_start(&mut self, payload: Payload) -> Result<String> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::task_start".to_string(),
+        ))
+    }
 
     /// Stops the task specified by `task_id`. This function is called if the user cancels the job or if the time limit for job execution is exceeded. The implementation must cancel the task if it is still running.
     ///
@@ -231,7 +254,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn task_stop(&mut self, task_id: &str) -> Result<()>;
+    async fn task_stop(&mut self, task_id: &str) -> Result<()> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::task_stop".to_string(),
+        ))
+    }
 
     /// Returns the current status of the task specified by `task_id`.
     ///
@@ -252,7 +279,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn task_status(&mut self, task_id: &str) -> Result<TaskStatus>;
+    async fn task_status(&mut self, task_id: &str) -> Result<TaskStatus> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::task_status".to_string(),
+        ))
+    }
 
     /// Returns the results of the task.
     ///
@@ -274,7 +305,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn task_result(&mut self, task_id: &str) -> Result<TaskResult>;
+    async fn task_result(&mut self, task_id: &str) -> Result<TaskResult> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::task_result".to_string(),
+        ))
+    }
 
     /// Returns the log messages of the task.
     ///
@@ -296,7 +331,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn task_logs(&mut self, task_id: &str) -> Result<String>;
+    async fn task_logs(&mut self, task_id: &str) -> Result<String> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::task_logs".to_string(),
+        ))
+    }
 
     /// Returns a Target for the specified device. Vendor specific serialized data. This might contain the constraints(instructions, properteis and timing information etc.) of a particular device to allow compilers to compile an input circuit to something that works and is optimized for a device. In IBM implementation, it contains JSON representations of [BackendConfiguration](https://github.com/Qiskit/ibm-quantum-schemas/blob/main/schemas/backend_configuration_schema.json) and [BackendProperties](https://github.com/Qiskit/ibm-quantum-schemas/blob/main/schemas/backend_properties_schema.json) so that we are able to create a Target object by calling `qiskit_ibm_runtime.utils.backend_converter.convert_to_target` or uquivalent functions.
     ///
@@ -311,7 +350,11 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn target(&mut self) -> Result<Target>;
+    async fn target(&mut self) -> Result<Target> {
+        Err(QrmiError::UnsupportedFunction(
+            "qrmi::QuantumResource::target".to_string(),
+        ))
+    }
 
     /// Returns other specific to system or device data
     ///
@@ -328,5 +371,13 @@ pub trait QuantumResource: Send + Sync {
     ///     Ok(())
     /// }
     /// ```
-    async fn metadata(&mut self) -> std::collections::HashMap<String, String>;
+    async fn metadata(&mut self) -> std::collections::HashMap<String, String> {
+        let resource_type = std::any::type_name::<Self>();
+        log::warn!(
+            "metadata() is not implemented by this resource({}); \
+             an empty hashmap has been generated.",
+            resource_type
+        );
+        std::collections::HashMap::<String, String>::new()
+    }
 }
