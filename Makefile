@@ -30,7 +30,7 @@ build-stubgen: check-python-devel-installed
 ifeq ($(INSIDE_CONTAINER),1)
 	$(error "Manylinux images don't come with libpython, please run the command without ./run_in_container.sh")
 endif
-	PYO3_PYTHON=python$(PYTHON_VERSION) cargo build --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3"
+	PYO3_PYTHON=python$(PYTHON_VERSION) cargo build --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3-async"
 
 build-c-examples: $(LIBQRMI_SO_PATH)
 	@mkdir -p examples/qrmi/c/ibm_quantum_system/build
@@ -79,7 +79,7 @@ lint-stubgen: check-python-devel-installed
 ifeq ($(INSIDE_CONTAINER),1)
 	$(error "Manylinux images don't come with libpython, please run the command without ./run_in_container.sh")
 endif
-	PYO3_PYTHON=python$(PYTHON_VERSION) cargo clippy --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3" -- -D warnings
+	PYO3_PYTHON=python$(PYTHON_VERSION) cargo clippy --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3-async" -- -D warnings
 
 lint-wheels: $(PYTHON_VENV_DIR) install-wheels
 	@source $(PYTHON_VENV_ACTIVATE) && \
@@ -116,7 +116,7 @@ test-stubgen: check-python-devel-installed
 ifeq ($(INSIDE_CONTAINER),1)
 	$(error "Manylinux images don't come with libpython, please run the command without ./run_in_container.sh")
 endif
-	PYO3_PYTHON=python$(PYTHON_VERSION) cargo test --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3"
+	PYO3_PYTHON=python$(PYTHON_VERSION) cargo test --locked $(CARGO_PROFILE_FLAG) --bin stubgen --features="pyo3-async"
 
 test-wheels: $(PYTHON_VENV_DIR)
 	@source $(PYTHON_VENV_ACTIVATE) && \

@@ -164,7 +164,7 @@ This section will guide you through building QRMI for C, Python and Lua.
       .. code-block:: bash
 
          . ~/.cargo/env
-         cargo run --bin stubgen --features=pyo3
+         cargo run --bin stubgen --features=pyo3-async
 
       3. Create a wheel for distribution
 
